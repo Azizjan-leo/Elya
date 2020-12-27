@@ -1,11 +1,14 @@
-﻿public class OperationResult
+﻿namespace Revit
 {
-    public bool IsSucceeded { get; init; }
-    public string Message { get; init; }
-
-    public OperationResult(string message, bool isSucceeded)
+    public class OperationResult
     {
-        Message = message;
-        IsSucceeded = isSucceeded;
+        public bool IsSucceeded { get; set; }
+        public string Message { get; set; }
+
+        public OperationResult(string message, bool isSucceeded)
+        {
+            Message = message;
+            IsSucceeded = isSucceeded;
+        }
     }
 }

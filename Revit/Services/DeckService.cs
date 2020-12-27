@@ -9,25 +9,25 @@ namespace Revit.Services
 {
     public class DeckService
     {
-        private List<Deck> _decks = new List<Deck>();
-        public DeckService(){}
+        private readonly List<Deck> _decks = new List<Deck>();
 
         public Deck GetDeck(string name)
         {
-            var deck = _decks.Where(x => x.Name == name).FirstOrDefault();
+            var deck = _decks.FirstOrDefault(x => x.Name == name);
 
             return deck;
         }
 
         public OperationResult AddDeck(string name, ushort capacity)
         {
-            if(_decks.Exists(x => x.Name == name))
+            if (_decks.Exists(x => x.Name == name))
                 return new OperationResult($"The name {name} is taken.", false);
             try
             {
-                Deck deck = new Deck(name, capacity);
+                var deck = new Deck(name, capacity);
                 _decks.Add(deck);
-                return new OperationResult($"The {name} deck has been successfully added!", true);
+                return new OperationResult(
+                    $"The {name} deck has been successfully added!", true);
             }
             catch (Exception e)
             {
@@ -35,7 +35,7 @@ namespace Revit.Services
             }
         }
 
-        internal OperationResult AddCard(ref Deck deck, string name, ushort number)
+        public static OperationResult AddCard(ref Deck deck, string name, ushort number)
         {
             return deck.AddCard(number, name);
         }

@@ -2,8 +2,8 @@
 {
     public class Card
     {
-        public ushort Number { get; init; }
-        public string Name { get; init; }
+        public ushort Number { get; set; }
+        public string Name { get; set; }
 
         public Card(ushort number, string name)
         {
