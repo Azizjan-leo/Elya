@@ -6,27 +6,29 @@ namespace Revit.Models
 {
     public class Deck
     {
-        static readonly ushort _limit = 100;
-        private readonly ushort limit;
+        private const ushort Limit = 100;
+        private readonly ushort _limit;
         public string Name { get; set; }
-        public bool Sorted { get; set; } = false;
+        public bool Sorted { get; private set; }
+
         public List<Card> Cards;
+
         public Deck(string name, ushort capacity)
         {
-            if (capacity > _limit)
+            if (capacity > Limit)
                 throw new Exception("Limit overflow!");
-           
+
             Name = name;
-            limit = capacity;
+            _limit = capacity;
             Cards = new List<Card>(capacity);
         }
 
         public OperationResult AddCard(ushort number, string name)
         {
-            if (Cards.Count == limit)
+            if (Cards.Count == _limit)
                 return new OperationResult("Limit overflow!", false);
 
-            if(Cards.Exists(x => x.Name == name))
+            if (Cards.Exists(x => x.Name == name))
                 return new OperationResult($"The {Name} deck already has a card named {name}.", false);
 
             if (Cards.Exists(x => x.Number == number))
@@ -37,18 +39,21 @@ namespace Revit.Models
             return new OperationResult($"The card {name} has been successfully added to the {Name} deck", true);
         }
 
-        internal void Unsort()
+        public void Unsort()
         {
-            Random random = new Random();
-            int n = Cards.Count;
+            var random = new Random();
+
+            var n = Cards.Count;
+
             while (n > 1)
             {
                 n--;
-                int k = random.Next(n + 1);
-                Card value = Cards[k];
+                var k = random.Next(n + 1);
+                var value = Cards[k];
                 Cards[k] = Cards[n];
                 Cards[n] = value;
             }
+
             Sorted = false;
         }
 

@@ -4,82 +4,83 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-public class Animal
+namespace Elya
 {
-    public virtual int Age { get; init; }
-    // для десериализации
-    public Animal()
+    public class Animal
     {
-        Age = 0;
-    }
-    public Animal(int age)
-    {
-        Age = age;
-    }
-    public virtual string GetVoice()
-    {
-        return "I have no voice";
-    }
-}
+        public int Age { get; set; }
 
-public class Cat : Animal
-{
-    // для десериализации
-    private Cat() : base(0) { }
-    public Cat(int age) : base(age)
-    {
-    }
-    public override string GetVoice()
-    {
-        return "Meow";
-    }
-}
-
-class Program
-{
-    static void ToXML(Animal animal)
-    {
-        // сохранение данных
-        using (FileStream fs = new FileStream("Elya2.xml", FileMode.OpenOrCreate))
+        // для десериализации
+        public Animal()
         {
-            XmlSerializer x = new XmlSerializer(typeof(Animal));
+        }
+
+        public Animal(int age) => Age = age;
+
+        public virtual string GetVoice()
+        {
+            return "I have no voice";
+        }
+    }
+
+    public class Cat : Animal
+    {
+        // для десериализации
+        public Cat()
+        {
+        }
+
+        public Cat(int age) : base(age)
+        {
+        }
+
+        public override string GetVoice()
+        {
+            return "Meow";
+        }
+    }
+
+    public static class Program
+    {
+        private static void ToXml(Animal animal)
+        {
+            // сохранение данных
+            using var fs = new FileStream("Elya2.xml", FileMode.OpenOrCreate);
+            var x = new XmlSerializer(typeof(Animal));
             x.Serialize(fs, animal);
         }
-    }
-    static Animal FromXML()
-    {
-        using (FileStream fs = new FileStream("Elya2.xml", FileMode.OpenOrCreate))
+
+        private static Animal FromXml()
         {
-            XmlSerializer x = new XmlSerializer(typeof(Animal));
-            var animal = (Animal)x.Deserialize(fs);
+            using var fs = new FileStream("Elya2.xml", FileMode.OpenOrCreate);
+            var x = new XmlSerializer(typeof(Animal));
+            var animal = (Animal) x.Deserialize(fs);
             return animal;
         }
-    }
-    async Task ToJson(Animal animal)
-    {
-        using (FileStream fs = new FileStream("Elya.json", FileMode.OpenOrCreate))
+
+        private static async Task ToJson(Animal animal)
         {
-            await JsonSerializer.SerializeAsync<Animal>(fs, animal);
+            await using var fs = new FileStream("Elya.json", FileMode.OpenOrCreate);
+            await JsonSerializer.SerializeAsync(fs, animal);
         }
-    }
-    async Task<Animal> FromJson()
-    {
-        using (FileStream fs = new FileStream("Elya.json", FileMode.OpenOrCreate))
+
+        private static async Task<Animal> FromJson()
         {
-            Animal animal = await JsonSerializer.DeserializeAsync<Animal>(fs);
+            await using var fs = new FileStream("Elya.json", FileMode.OpenOrCreate);
+            var animal = await JsonSerializer.DeserializeAsync<Animal>(fs);
             return animal;
         }
-    }
 
-    static async Task Main(string[] args)
-    {
-        Animal animal = new Animal(1);
-        Cat cat = new Cat(2);
-       
-        Console.WriteLine($"Animal's age bf serializing: {animal.Age}");
-        ToXML(animal);
+        private static void Main()
+        {
+            var animal = new Animal(1);
+            var cat = new Cat(2);
 
-        Animal restoredAnimal = FromXML();
-        Console.WriteLine($"Restored animal's age: {restoredAnimal.Age}");
+            Console.WriteLine($"Animal's age bf serializing: {animal.Age}");
+            ToXml(animal);
+
+            var restoredAnimal = FromXml();
+            Console.WriteLine($"Restored animal's age: {restoredAnimal.Age}");
+        }
     }
 }
